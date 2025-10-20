@@ -1,30 +1,5 @@
 # Budget Tracker Backend (Spring Boot)
 
-## Requirements
-- Java 17+
-- Maven 3.9+
-- PostgreSQL
-
-## Configuration
-Edit `server/src/main/resources/application.yml`:
-```
-spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/budget_db
-    username: postgres
-    password: postgres
-app:
-  jwt:
-    secret: <base64-encoded-random-secret>
-    expiration-ms: 2592000000
-```
-Generate a strong Base64 secret, e.g. 64+ bytes.
-
-## Run
-```
-# from C:\Users\lawio\budget_tracker\server
-mvn spring-boot:run
-```
 App runs on `http://localhost:8080`.
 
 ## API
