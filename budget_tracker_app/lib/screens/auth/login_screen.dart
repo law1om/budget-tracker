@@ -9,27 +9,44 @@
    State<LoginScreen> createState() => _LoginScreenState();
  }
 
- class _LoginScreenState extends State<LoginScreen> {
-   final _formKey = GlobalKey<FormState>();
-   final _usernameCtrl = TextEditingController();
-   final _passwordCtrl = TextEditingController();
-   bool _loading = false;
+class _LoginScreenState extends State<LoginScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _emailCtrl = TextEditingController();
+  final _passwordCtrl = TextEditingController();
+  bool _loading = false;
+  String? _errorMessage;
 
-   @override
-   void dispose() {
-     _usernameCtrl.dispose();
-     _passwordCtrl.dispose();
-     super.dispose();
-   }
+  @override
+  void dispose() {
+    _emailCtrl.dispose();
+    _passwordCtrl.dispose();
+    super.dispose();
+  }
 
-   Future<void> _submit() async {
-     if (!_formKey.currentState!.validate()) return;
-     setState(() => _loading = true);
-     await context.read<AuthProvider>().login(_usernameCtrl.text, _passwordCtrl.text);
-     if (mounted) {
-       Navigator.of(context).pushReplacementNamed('/home');
-     }
-   }
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() {
+      _loading = true;
+      _errorMessage = null;
+    });
+    
+    try {
+      await context.read<AuthProvider>().login(
+        _emailCtrl.text,
+        _passwordCtrl.text,
+      );
+      if (mounted) {
+        Navigator.of(context).pushReplacementNamed('/home');
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _loading = false;
+          _errorMessage = e.toString();
+        });
+      }
+    }
+  }
 
    @override
    Widget build(BuildContext context) {
@@ -40,15 +57,28 @@
            padding: const EdgeInsets.all(24.0),
            child: Form(
              key: _formKey,
-             child: Column(
-               crossAxisAlignment: CrossAxisAlignment.stretch,
-               children: [
-                 TextFormField(
-                   controller: _usernameCtrl,
-                   decoration: const InputDecoration(labelText: 'Имя пользователя'),
-                   validator: (v) => (v == null || v.isEmpty) ? 'Введите имя пользователя' : null,
-                 ),
-                 const SizedBox(height: 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (_errorMessage != null)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: Text(
+                      _errorMessage!,
+                      style: TextStyle(color: Theme.of(context).colorScheme.error),
+                    ),
+                  ),
+                TextFormField(
+                  controller: _emailCtrl,
+                  decoration: const InputDecoration(labelText: 'Email'),
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (v) {
+                    if (v == null || v.isEmpty) return 'Введите email';
+                    if (!v.contains('@')) return 'Некорректный email';
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 12),
                  TextFormField(
                    controller: _passwordCtrl,
                    decoration: const InputDecoration(labelText: 'Пароль'),

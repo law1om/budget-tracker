@@ -69,8 +69,16 @@ class _RootState extends State<_Root> {
   Future<void> _init(BuildContext context) async {
     if (_initStarted) return;
     _initStarted = true;
-    await context.read<AuthProvider>().initialize();
-    await context.read<TransactionProvider>().initialize();
+    final auth = context.read<AuthProvider>();
+    final txProvider = context.read<TransactionProvider>();
+    
+    await auth.initialize();
+    await txProvider.initialize();
+    
+    // Sync user balance to transaction provider
+    if (auth.user != null) {
+      txProvider.setInitialBalance(auth.user!.balance);
+    }
   }
 
   @override
