@@ -1,0 +1,29 @@
+# -----------------------------
+# GitHub Linguist configuration
+# -----------------------------
+
+
+build/** linguist-vendored
+web/** linguist-vendored
+android/** linguist-vendored
+ios/** linguist-vendored
+macos/** linguist-vendored
+windows/** linguist-vendored
+linux/** linguist-vendored
+server/target/** linguist-vendored
+server/out/** linguist-vendored
+
+
+*.html linguist-detectable=false
+*.htm linguist-detectable=false
+
+
+*.dart linguist-language=Dart
+*.java linguist-language=Java
+*.yml linguist-language=YAML
+*.yaml linguist-language=YAML
+
+# -----------------------------
+# Text file normalization
+# -----------------------------
+* text=auto eol=lf

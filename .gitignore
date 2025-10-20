@@ -1,4 +1,7 @@
-# Root .gitignore for Budget Tracker (Flutter app + Java/Maven server)
+# =====================================================
+# Root .gitignore for Budget Tracker
+# Flutter frontend + Java/Maven backend
+# =====================================================
 
 # -----------------------------
 # OS / General
@@ -10,14 +13,19 @@ Thumbs.db
 *.swp
 *.swo
 
+# -----------------------------
 # Environment / Secrets
+# -----------------------------
 .env
 .env.*
 *.keystore
 *.jks
 *.p12
+*.pem
 
+# -----------------------------
 # Editors / IDE
+# -----------------------------
 .vscode/
 .idea/
 *.iml
@@ -34,10 +42,11 @@ Thumbs.db
 .fvm/
 .melos_tool/
 coverage/
-# App projects typically commit pubspec.lock; do not ignore
-
-# Flutter builds (all platforms)
+.pub-cache/
 build/
+.flutter-plugins/
+.flutter-plugins-dependencies
+analysis_options.yaml
 
 # Platform-specific build dirs
 android/**/build/
@@ -46,6 +55,11 @@ macos/**/build/
 windows/**/build/
 linux/**/build/
 web/**/build/
+
+# Flutter generated web output
+web/
+build/web/
+# If you deploy to web, include only lib/ and assets/ in repo.
 
 # -----------------------------
 # Android
@@ -65,35 +79,49 @@ ios/Pods/
 ios/.symlinks/
 ios/Flutter/Flutter.framework/
 ios/Flutter/Flutter.podspec
-# Xcode user data
 **/xcuserdata/
 **/DerivedData/
 
 # -----------------------------
-# Desktop (Linux/Windows/macOS) extras
-# Already covered builds above, keep project files tracked.
-
-# -----------------------------
-# Java / Maven server
+# Java / Maven Server
 # -----------------------------
 server/target/
 server/out/
 server/.idea/
 server/*.iml
-# Maven wrappers should be kept; do not ignore .mvn/wrapper
+server/.settings/
+server/.classpath
+server/.project
+
+# Maven & Gradle cache
+.mvn/timing.properties
+.gradle/
+.mvn/wrapper/maven-wrapper.jar
+
 
 # -----------------------------
-# Node (just in case of tooling)
+# Reports / Generated Files
 # -----------------------------
-node_modules/
-
-# -----------------------------
-# Misc
-# -----------------------------
+reports/
+logs/
+tmp/
+out/
+coverage/
 *.orig
 *.rej
 
+<<<<<<< HEAD
 web/
 budget_tracker_app/web/
 budget_tracker_app/build/
 server/target/
+=======
+# -----------------------------
+# System backup files
+# -----------------------------
+*.bak
+*.backup
+*.tmp
+*.swp
+*.swo
+>>>>>>> ffaa5a5 (1)
