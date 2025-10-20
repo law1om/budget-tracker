@@ -1,0 +1,26 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/budget_db
+    username: postgres
+    password: 19189
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: false
+
+app:
+  jwt:
+    secret: UmVL4yA7od7lKDeLypwNgJZv6C2yENltOSnhw0rHvOqGsj701gQvBLrX3kNt+BCcKhpjjBRClxzF2OYbjWNIaQ==
+    expiration-ms: 2592000000
+  cors:
+    allowed-origins: "*"
+    allowed-methods: "GET,POST,PUT,DELETE,OPTIONS"
+    allowed-headers: "*"
+    allow-credentials: false

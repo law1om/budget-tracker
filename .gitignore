@@ -1,0 +1,94 @@
+# Root .gitignore for Budget Tracker (Flutter app + Java/Maven server)
+
+# -----------------------------
+# OS / General
+# -----------------------------
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.swp
+*.swo
+
+# Environment / Secrets
+.env
+.env.*
+*.keystore
+*.jks
+*.p12
+
+# Editors / IDE
+.vscode/
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# -----------------------------
+# Flutter / Dart
+# -----------------------------
+.dart_tool/
+.packages
+.flutter-plugins
+.flutter-plugins-dependencies
+.fvm/
+.melos_tool/
+coverage/
+# App projects typically commit pubspec.lock; do not ignore
+
+# Flutter builds (all platforms)
+build/
+
+# Platform-specific build dirs
+android/**/build/
+ios/**/build/
+macos/**/build/
+windows/**/build/
+linux/**/build/
+web/**/build/
+
+# -----------------------------
+# Android
+# -----------------------------
+android/.gradle/
+android/local.properties
+android/**/.cxx/
+android/**/captures/
+*.apk
+*.aar
+*.aab
+
+# -----------------------------
+# iOS
+# -----------------------------
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Flutter.framework/
+ios/Flutter/Flutter.podspec
+# Xcode user data
+**/xcuserdata/
+**/DerivedData/
+
+# -----------------------------
+# Desktop (Linux/Windows/macOS) extras
+# Already covered builds above, keep project files tracked.
+
+# -----------------------------
+# Java / Maven server
+# -----------------------------
+server/target/
+server/out/
+server/.idea/
+server/*.iml
+# Maven wrappers should be kept; do not ignore .mvn/wrapper
+
+# -----------------------------
+# Node (just in case of tooling)
+# -----------------------------
+node_modules/
+
+# -----------------------------
+# Misc
+# -----------------------------
+*.orig
+*.rej
