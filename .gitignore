@@ -92,3 +92,8 @@ node_modules/
 # -----------------------------
 *.orig
 *.rej
+
+web/
+budget_tracker_app/web/
+budget_tracker_app/build/
+server/target/
