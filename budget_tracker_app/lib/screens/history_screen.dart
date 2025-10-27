@@ -28,7 +28,7 @@ class HistoryScreen extends StatelessWidget {
           return Dismissible(
             key: ValueKey(tx.id),
             background: Container(color: Colors.redAccent),
-            onDismissed: (_) => context.read<TransactionProvider>().remove(tx.id),
+            onDismissed: (_) async => await context.read<TransactionProvider>().remove(tx.id),
             child: TransactionTile(
               tx: tx,
               category: category,
@@ -79,8 +79,8 @@ class HistoryScreen extends StatelessWidget {
           ],
         ),
       );
-      if (confirmed == true) {
-        context.read<TransactionProvider>().remove(tx.id);
+      if (confirmed == true && context.mounted) {
+        await context.read<TransactionProvider>().remove(tx.id);
       }
     }
   }

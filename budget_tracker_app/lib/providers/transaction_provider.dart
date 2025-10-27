@@ -2,9 +2,11 @@
 import '../models/transaction_model.dart';
 import '../models/category_model.dart';
 import '../services/local_storage_service.dart';
+import '../services/api_service.dart';
 
 class TransactionProvider with ChangeNotifier {
   final LocalStorageService _storage = LocalStorageService();
+  final ApiService _apiService = ApiService();
 
   List<TransactionModel> _transactions = [];
   double _initialBalance = 0.0;
@@ -15,6 +17,10 @@ class TransactionProvider with ChangeNotifier {
     await _storage.init();
     final json = _storage.transactionsJson;
     _transactions = TransactionModel.decodeList(json);
+    
+    // Token is already set by AuthProvider since ApiService is now a singleton
+    debugPrint('📊 TransactionProvider initialized with ${_transactions.length} transactions');
+    
     notifyListeners();
   }
 
@@ -22,23 +28,38 @@ class TransactionProvider with ChangeNotifier {
     await _storage.saveTransactionsJson(TransactionModel.encodeList(_transactions));
   }
 
-  void add(TransactionModel tx) {
+  /// Sync calculated balance to server
+  Future<void> _syncBalanceToServer() async {
+    try {
+      debugPrint('🔄 Syncing balance to server: $balance');
+      final result = await _apiService.updateUser(balance: balance);
+      debugPrint('✅ Balance synced successfully. Server returned: ${result.balance}');
+    } catch (e) {
+      debugPrint('❌ Failed to sync balance to server: $e');
+      rethrow; // Re-throw to see the error in UI
+    }
+  }
+
+  Future<void> add(TransactionModel tx) async {
     _transactions.insert(0, tx);
-    _persist();
+    await _persist();
+    await _syncBalanceToServer();
     notifyListeners();
   }
 
-  void update(TransactionModel tx) {
+  Future<void> update(TransactionModel tx) async {
     final index = _transactions.indexWhere((e) => e.id == tx.id);
     if (index == -1) return;
     _transactions[index] = tx;
-    _persist();
+    await _persist();
+    await _syncBalanceToServer();
     notifyListeners();
   }
 
-  void remove(String id) {
+  Future<void> remove(String id) async {
     _transactions.removeWhere((e) => e.id == id);
-    _persist();
+    await _persist();
+    await _syncBalanceToServer();
     notifyListeners();
   }
 

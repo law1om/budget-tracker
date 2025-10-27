@@ -19,7 +19,11 @@ class ApiService {
   late final Dio _dio;
   String? _token;
 
-  ApiService() {
+  // Singleton pattern
+  static final ApiService _instance = ApiService._internal();
+  factory ApiService() => _instance;
+
+  ApiService._internal() {
     _dio = Dio(BaseOptions(
       baseUrl: ApiConfig.baseUrl,
       connectTimeout: ApiConfig.connectTimeout,
@@ -170,13 +174,20 @@ class ApiService {
       if (balance != null) data['balance'] = balance;
       if (currency != null) data['currency'] = currency;
 
+      print('📤 Sending update request to ${ApiConfig.userUpdate}');
+      print('   Data: $data');
+      print('   Token: ${_token != null ? "Present (${_token!.substring(0, 20)}...)" : "Missing!"}');
+
       final response = await _dio.put(
         ApiConfig.userUpdate,
         data: data,
       );
 
+      print('📥 Received response: ${response.data}');
       return UserModel.fromJson(response.data);
     } on DioException catch (e) {
+      print('❌ DioException: ${e.message}');
+      print('   Response: ${e.response?.data}');
       throw e.error ?? ApiException('Failed to update user');
     }
   }

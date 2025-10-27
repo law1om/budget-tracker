@@ -194,8 +194,8 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
       );
-      if (confirmed == true) {
-        context.read<TransactionProvider>().remove(tx.id);
+      if (confirmed == true && context.mounted) {
+        await context.read<TransactionProvider>().remove(tx.id);
       }
     }
   }

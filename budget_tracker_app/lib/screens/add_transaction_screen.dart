@@ -204,7 +204,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                               categoryId: _categoryId,
                               type: _type,
                             );
-                            context.read<TransactionProvider>().add(tx);
+                            await context.read<TransactionProvider>().add(tx);
                           } else {
                             final tx = TransactionModel(
                               id: _editingId,
@@ -214,9 +214,11 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                               categoryId: _categoryId,
                               type: _type,
                             );
-                            context.read<TransactionProvider>().update(tx);
+                            await context.read<TransactionProvider>().update(tx);
                           }
-                          Navigator.of(context).pop();
+                          if (context.mounted) {
+                            Navigator.of(context).pop();
+                          }
                         },
                       ),
                     )

@@ -24,10 +24,20 @@ public class UserController {
     @PutMapping("/me")
     public ResponseEntity<User> updateMe(@AuthenticationPrincipal User user,
                                          @Valid @RequestBody UserUpdateRequest request) {
+        System.out.println("📥 Update request received:");
+        System.out.println("  Name: " + request.getName());
+        System.out.println("  Balance: " + request.getBalance());
+        System.out.println("  Currency: " + request.getCurrency());
+        
         if (request.getName() != null) user.setName(request.getName());
-        if (request.getBalance() != null) user.setBalance(request.getBalance());
+        if (request.getBalance() != null) {
+            System.out.println("💰 Setting balance: " + request.getBalance());
+            user.setBalance(request.getBalance());
+        }
         if (request.getCurrency() != null) user.setCurrency(request.getCurrency());
-        userRepository.save(user);
-        return ResponseEntity.ok(user);
+        
+        User savedUser = userRepository.save(user);
+        System.out.println("✅ User saved. Balance in DB: " + savedUser.getBalance());
+        return ResponseEntity.ok(savedUser);
     }
 }
