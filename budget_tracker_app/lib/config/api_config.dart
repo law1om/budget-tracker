@@ -1,10 +1,8 @@
 /// API Configuration
 class ApiConfig {
-  // Измените этот URL на адрес вашего сервера
-  // Для Android эмулятора: 'http://10.0.2.2:8080'
   // Для iOS симулятора: 'http://localhost:8080'
   // Для реального устройства: 'http://YOUR_IP:8080'
-  static const String baseUrl = 'http://localhost:8080';
+  static const String baseUrl = 'http://192.168.0.102:8080';
   
   // Endpoints
   static const String register = '/api/auth/register';

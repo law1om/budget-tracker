@@ -1,6 +1,7 @@
  import 'package:flutter/material.dart';
  import 'package:provider/provider.dart';
  import '../../providers/auth_provider.dart';
+ import '../../providers/transaction_provider.dart';
 
  class RegisterScreen extends StatefulWidget {
    const RegisterScreen({super.key});
@@ -33,12 +34,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
     });
     
     try {
-      await context.read<AuthProvider>().register(
+      final auth = context.read<AuthProvider>();
+      await auth.register(
         _nameCtrl.text,
         _emailCtrl.text,
         _passwordCtrl.text,
       );
-      if (mounted) {
+      
+      // Initialize TransactionProvider for the new user
+      if (mounted && auth.user != null) {
+        final txProvider = context.read<TransactionProvider>();
+        await txProvider.initialize(auth.user!.id);
+        txProvider.setInitialBalance(auth.user!.balance);
         Navigator.of(context).pushReplacementNamed('/home');
       }
     } catch (e) {

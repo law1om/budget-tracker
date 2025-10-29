@@ -73,10 +73,10 @@ class _RootState extends State<_Root> {
     final txProvider = context.read<TransactionProvider>();
     
     await auth.initialize();
-    await txProvider.initialize();
     
-    // Sync user balance to transaction provider
+    // Initialize transaction provider with userId if logged in
     if (auth.user != null) {
+      await txProvider.initialize(auth.user!.id);
       txProvider.setInitialBalance(auth.user!.balance);
     }
   }

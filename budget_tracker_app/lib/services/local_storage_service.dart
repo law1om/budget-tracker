@@ -14,7 +14,7 @@
   static const _kUserId = 'user_id';
   static const _kUserEmail = 'user_email';
   static const _kCurrencyCode = 'currency_code'; // KZT/USD/EUR
-  static const _kTransactions = 'transactions_json';
+  static const _kTransactionsPrefix = 'transactions_json_user_'; // Per-user transactions
 
   Future<void> init() async {
     _prefs ??= await SharedPreferences.getInstance();
@@ -74,11 +74,18 @@
 
    String get currencyCode => _prefs!.getString(_kCurrencyCode) ?? 'KZT';
 
-   // Transactions
-   Future<void> saveTransactionsJson(String json) async {
-     await _prefs!.setString(_kTransactions, json);
+   // Transactions (per-user storage)
+   Future<void> saveTransactionsJson(String json, int userId) async {
+     await _prefs!.setString('$_kTransactionsPrefix$userId', json);
    }
 
-   String? get transactionsJson => _prefs!.getString(_kTransactions);
+   String? getTransactionsJson(int userId) {
+     return _prefs!.getString('$_kTransactionsPrefix$userId');
+   }
+
+   // Clear user-specific data on logout
+   Future<void> clearUserData(int userId) async {
+     await _prefs!.remove('$_kTransactionsPrefix$userId');
+   }
  }
 

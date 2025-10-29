@@ -10,22 +10,28 @@ class TransactionProvider with ChangeNotifier {
 
   List<TransactionModel> _transactions = [];
   double _initialBalance = 0.0;
+  int? _userId;
 
   List<TransactionModel> get transactions => List.unmodifiable(_transactions);
 
-  Future<void> initialize() async {
+  Future<void> initialize(int userId) async {
     await _storage.init();
-    final json = _storage.transactionsJson;
+    _userId = userId;
+    final json = _storage.getTransactionsJson(userId);
     _transactions = TransactionModel.decodeList(json);
     
     // Token is already set by AuthProvider since ApiService is now a singleton
-    debugPrint('📊 TransactionProvider initialized with ${_transactions.length} transactions');
+    debugPrint('📊 TransactionProvider initialized for user $userId with ${_transactions.length} transactions');
     
     notifyListeners();
   }
 
   Future<void> _persist() async {
-    await _storage.saveTransactionsJson(TransactionModel.encodeList(_transactions));
+    if (_userId == null) {
+      debugPrint('⚠️ Cannot persist transactions: userId is null');
+      return;
+    }
+    await _storage.saveTransactionsJson(TransactionModel.encodeList(_transactions), _userId!);
   }
 
   /// Sync calculated balance to server
@@ -76,6 +82,15 @@ class TransactionProvider with ChangeNotifier {
   /// Update initial balance (e.g., when currency changes)
   void setInitialBalance(double balance) {
     _initialBalance = balance;
+    notifyListeners();
+  }
+
+  /// Clear all data when switching accounts
+  void clear() {
+    _transactions = [];
+    _initialBalance = 0.0;
+    _userId = null;
+    debugPrint('🧹 TransactionProvider cleared');
     notifyListeners();
   }
 

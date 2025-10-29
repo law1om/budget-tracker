@@ -30,6 +30,7 @@ class HomeScreen extends StatelessWidget {
           IconButton(
             tooltip: 'Выйти',
             onPressed: () async {
+              context.read<TransactionProvider>().clear();
               await context.read<AuthProvider>().logout();
               if (context.mounted) {
                 Navigator.of(context).pushReplacementNamed('/login');
@@ -41,7 +42,10 @@ class HomeScreen extends StatelessWidget {
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-          await context.read<TransactionProvider>().initialize();
+          final userId = context.read<AuthProvider>().user?.id;
+          if (userId != null) {
+            await context.read<TransactionProvider>().initialize(userId);
+          }
         },
         child: ListView(
           padding: const EdgeInsets.all(16),

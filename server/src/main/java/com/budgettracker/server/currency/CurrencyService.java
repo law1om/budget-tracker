@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.math.MathContext;
 import java.util.Map;
 
 /**
@@ -19,6 +20,16 @@ public class CurrencyService {
         "EUR", new BigDecimal("0.86"),
         "KZT", new BigDecimal("535.0")
     );
+
+    // Количество десятичных знаков для отображения суммы по валютам
+    private static final Map<String, Integer> SCALE_BY_CURRENCY = Map.of(
+        "USD", 6,
+        "EUR", 6,
+        "KZT", 2
+    );
+
+    // Высокоточная математика с половинным округлением до четного для уменьшения систематической ошибки
+    private static final MathContext MC = new MathContext(34, RoundingMode.HALF_EVEN);
 
     /**
      * Конвертация суммы из одной валюты в другую
@@ -42,10 +53,13 @@ public class CurrencyService {
             throw new RuntimeException("Неподдерживаемая валюта: " + from + " или " + to);
         }
         
-        // Конвертация через USD:
-        // 1. Конвертируем from -> USD: amount / fromRate
-        // 2. Конвертируем USD -> to: result * toRate
-        BigDecimal inUsd = amount.divide(fromRate, 10, RoundingMode.HALF_UP);
-        return inUsd.multiply(toRate).setScale(4, RoundingMode.HALF_UP);
+        // Конвертация через USD с высоким уровнем точности и финальным округлением:
+        // 1) from -> USD: amount / fromRate (без финального округления)
+        // 2) USD -> to: result * toRate (без финального округления)
+        // 3) Финальное округление по правилам валюты назначения
+        BigDecimal inUsd = amount.divide(fromRate, MC);
+        BigDecimal result = inUsd.multiply(toRate, MC);
+        int scale = SCALE_BY_CURRENCY.getOrDefault(to, 2);
+        return result.setScale(scale, RoundingMode.HALF_EVEN);
     }
 }

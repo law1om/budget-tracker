@@ -37,7 +37,7 @@ public class User implements UserDetails {
     private BigDecimal balance = BigDecimal.ZERO;
 
     @Builder.Default
-    private String currency = "USD";
+    private String currency = "KZT";
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

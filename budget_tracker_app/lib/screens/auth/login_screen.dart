@@ -1,6 +1,7 @@
  import 'package:flutter/material.dart';
  import 'package:provider/provider.dart';
  import '../../providers/auth_provider.dart';
+ import '../../providers/transaction_provider.dart';
 
  class LoginScreen extends StatefulWidget {
    const LoginScreen({super.key});
@@ -31,11 +32,17 @@ class _LoginScreenState extends State<LoginScreen> {
     });
     
     try {
-      await context.read<AuthProvider>().login(
+      final auth = context.read<AuthProvider>();
+      await auth.login(
         _emailCtrl.text,
         _passwordCtrl.text,
       );
-      if (mounted) {
+      
+      // Initialize TransactionProvider for the logged-in user
+      if (mounted && auth.user != null) {
+        final txProvider = context.read<TransactionProvider>();
+        await txProvider.initialize(auth.user!.id);
+        txProvider.setInitialBalance(auth.user!.balance);
         Navigator.of(context).pushReplacementNamed('/home');
       }
     } catch (e) {

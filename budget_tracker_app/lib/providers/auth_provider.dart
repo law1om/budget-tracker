@@ -142,6 +142,11 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<void> logout() async {
+    // Clear user-specific transaction data if user exists
+    if (_user != null) {
+      await _storage.clearUserData(_user!.id);
+    }
+    
     _isLoggedIn = false;
     _user = null;
     _apiService.clearToken();
