@@ -36,7 +36,12 @@ public class TransactionController {
             @AuthenticationPrincipal User user,
             @Valid @RequestBody TransactionRequest request) {
         
+        System.out.println("=== POST /api/transactions ===");
+        System.out.println("Request received - Type: " + request.getType() + ", Title: " + request.getTitle());
+        
         TransactionResponse response = transactionService.createTransaction(user.getId(), request);
+        
+        System.out.println("Response - ID: " + response.getId() + ", Type: " + response.getType());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
     

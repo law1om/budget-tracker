@@ -24,6 +24,11 @@ class TransactionProvider with ChangeNotifier {
       _transactions = await _apiService.getTransactions();
       debugPrint('✅ Loaded ${_transactions.length} transactions from server');
       
+      // Log transaction types
+      final incomeCount = _transactions.where((t) => t.type == TransactionType.income).length;
+      final expenseCount = _transactions.where((t) => t.type == TransactionType.expense).length;
+      debugPrint('   📊 Income: $incomeCount, Expense: $expenseCount');
+      
       // Save to local storage as backup
       await _persist();
     } catch (e) {
@@ -53,22 +58,25 @@ class TransactionProvider with ChangeNotifier {
       debugPrint('✅ Balance synced successfully. Server returned: ${result.balance}');
     } catch (e) {
       debugPrint('❌ Failed to sync balance to server: $e');
-      rethrow; // Re-throw to see the error in UI
+      // Don't rethrow - balance sync failure shouldn't prevent transaction from being saved
     }
   }
 
   Future<void> add(TransactionModel tx) async {
+    debugPrint('➕ Adding transaction: type=${tx.type.name}, amount=${tx.amount}, title=${tx.title}');
+    
     try {
       // Create on server
       final created = await _apiService.createTransaction(tx);
       _transactions.insert(0, created);
-      debugPrint('✅ Transaction created on server with ID: ${created.id}');
+      debugPrint('✅ Transaction created on server with ID: ${created.id}, type: ${created.type.name}');
     } catch (e) {
       debugPrint('⚠️ Failed to create on server, saving locally: $e');
       _transactions.insert(0, tx);
     }
     
     await _persist();
+    debugPrint('💾 Transactions persisted. Total count: ${_transactions.length}');
     await _syncBalanceToServer();
     notifyListeners();
   }

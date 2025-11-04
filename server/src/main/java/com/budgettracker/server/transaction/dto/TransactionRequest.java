@@ -11,8 +11,7 @@ import java.time.LocalDateTime;
 @Data
 public class TransactionRequest {
     
-    @NotBlank(message = "Title is required")
-    private String title;
+    private String title; // Optional field
     
     @NotNull(message = "Amount is required")
     @DecimalMin(value = "0.01", message = "Amount must be greater than 0")

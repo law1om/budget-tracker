@@ -14,9 +14,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Сервис для работы с транзакциями пользователей
- */
+
 @Service
 public class TransactionService {
     
@@ -26,21 +24,34 @@ public class TransactionService {
         this.transactionRepository = transactionRepository;
     }
     
-    /**
-     * Создать новую транзакцию
-     */
+    
     @Transactional
     public TransactionResponse createTransaction(Long userId, TransactionRequest request) {
+        System.out.println("=== Creating Transaction ===");
+        System.out.println("User ID: " + userId);
+        System.out.println("Type: " + request.getType());
+        System.out.println("Title: " + request.getTitle());
+        System.out.println("Amount: " + request.getAmount());
+        System.out.println("Category ID: " + request.getCategoryId());
+        
+     
+        String title = (request.getTitle() == null || request.getTitle().isBlank()) 
+                ? "" 
+                : request.getTitle();
+        
         Transaction transaction = Transaction.builder()
                 .userId(userId)
-                .title(request.getTitle())
+                .title(title)
                 .amount(request.getAmount())
                 .date(request.getDate())
                 .categoryId(request.getCategoryId())
                 .type(request.getType())
                 .build();
         
+        System.out.println("Transaction before save: " + transaction);
         transaction = transactionRepository.save(transaction);
+        System.out.println("Transaction after save - ID: " + transaction.getId());
+        System.out.println("=== Transaction Created Successfully ===");
         
         return TransactionResponse.fromEntity(transaction);
     }
@@ -90,7 +101,12 @@ public class TransactionService {
             throw new RuntimeException("Access denied");
         }
         
-        transaction.setTitle(request.getTitle());
+        // Use empty string if title is null or blank
+        String title = (request.getTitle() == null || request.getTitle().isBlank()) 
+                ? "" 
+                : request.getTitle();
+        
+        transaction.setTitle(title);
         transaction.setAmount(request.getAmount());
         transaction.setDate(request.getDate());
         transaction.setCategoryId(request.getCategoryId());

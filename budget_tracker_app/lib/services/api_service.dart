@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import '../config/api_config.dart';
 import '../models/auth_response.dart';
 import '../models/user_model.dart';
@@ -232,13 +233,20 @@ class ApiService {
   /// Create new transaction
   Future<TransactionModel> createTransaction(TransactionModel transaction) async {
     try {
+      final jsonData = transaction.toJson();
+      debugPrint('🌐 API: Creating transaction - ${jsonData}');
+      
       final response = await _dio.post(
         ApiConfig.transactions,
-        data: transaction.toJson(),
+        data: jsonData,
       );
       
+      debugPrint('✅ API: Transaction created - Response: ${response.data}');
       return TransactionModel.fromJson(response.data);
     } on DioException catch (e) {
+      debugPrint('❌ API: Failed to create transaction - ${e.message}');
+      debugPrint('   Error: ${e.error}');
+      debugPrint('   Response: ${e.response?.data}');
       throw e.error ?? ApiException('Failed to create transaction');
     }
   }
@@ -246,15 +254,22 @@ class ApiService {
   /// Get all transactions
   Future<List<TransactionModel>> getTransactions() async {
     try {
+      debugPrint('🌐 API: Fetching transactions...');
       final response = await _dio.get(ApiConfig.transactions);
       
+      debugPrint('✅ API: Received response - Type: ${response.data.runtimeType}');
+      
       if (response.data is List) {
-        return (response.data as List)
+        final transactions = (response.data as List)
             .map((json) => TransactionModel.fromJson(json))
             .toList();
+        debugPrint('   📊 Parsed ${transactions.length} transactions');
+        return transactions;
       }
+      debugPrint('⚠️ API: Response is not a list, returning empty');
       return [];
     } on DioException catch (e) {
+      debugPrint('❌ API: Failed to fetch transactions - ${e.message}');
       throw e.error ?? ApiException('Failed to fetch transactions');
     }
   }

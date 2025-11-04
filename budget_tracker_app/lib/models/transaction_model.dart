@@ -3,7 +3,7 @@
  enum TransactionType { income, expense }
 
  class TransactionModel {
-   final int? id; // null для новых транзакций, заполняется сервером
+   final int? id;
    final String title;
    final double amount;
    final DateTime date;
