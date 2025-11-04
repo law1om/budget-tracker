@@ -23,21 +23,10 @@ class HomeScreen extends StatelessWidget {
         title: Text('Привет, ${auth.username.isEmpty ? 'Гость' : auth.username}!'),
         actions: [
           IconButton(
-            tooltip: 'Валюта',
-            onPressed: () => Navigator.of(context).pushNamed('/currency'),
-            icon: const Icon(Icons.currency_exchange),
+            tooltip: 'Настройки',
+            onPressed: () => Navigator.of(context).pushNamed('/settings'),
+            icon: const Icon(Icons.settings_outlined),
           ),
-          IconButton(
-            tooltip: 'Выйти',
-            onPressed: () async {
-              context.read<TransactionProvider>().clear();
-              await context.read<AuthProvider>().logout();
-              if (context.mounted) {
-                Navigator.of(context).pushReplacementNamed('/login');
-              }
-            },
-            icon: const Icon(Icons.logout),
-          )
         ],
       ),
       body: RefreshIndicator(

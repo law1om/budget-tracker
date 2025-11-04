@@ -49,6 +49,13 @@ class DefaultCategories {
       isExpense: true,
     ),
     CategoryModel(
+      id: 'kids',
+      name: 'Дети',
+      icon: Icons.child_care,
+      color: Color(0xFFB9FBC0),
+      isExpense: true,
+    ),
+    CategoryModel(
       id: 'transport',
       name: 'Транспорт',
       icon: Icons.directions_bus,

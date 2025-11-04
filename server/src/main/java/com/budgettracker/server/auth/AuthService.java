@@ -38,6 +38,7 @@ public class AuthService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .build();
         userRepository.save(user);
+        
         String token = jwtService.generateToken(user.getEmail());
         return new AuthResponse(token, user);
     }
@@ -48,6 +49,7 @@ public class AuthService {
         );
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Invalid credentials"));
+        
         String token = jwtService.generateToken(user.getEmail());
         return new AuthResponse(token, user);
     }

@@ -23,7 +23,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   final _amountCtrl = TextEditingController();
   TransactionType _type = TransactionType.expense;
   String _categoryId = DefaultCategories.expenses.first.id;
-  String? _editingId;
+  int? _editingId;
   DateTime? _editingDate;
   bool _categoryLocked = false;
   String _txCurrency = 'KZT';

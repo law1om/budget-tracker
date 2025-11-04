@@ -17,12 +17,23 @@ class TransactionProvider with ChangeNotifier {
   Future<void> initialize(int userId) async {
     await _storage.init();
     _userId = userId;
-    final json = _storage.getTransactionsJson(userId);
-    _transactions = TransactionModel.decodeList(json);
     
-    // Token is already set by AuthProvider since ApiService is now a singleton
+    // Try to load from server first
+    try {
+      debugPrint('📡 Loading transactions from server...');
+      _transactions = await _apiService.getTransactions();
+      debugPrint('✅ Loaded ${_transactions.length} transactions from server');
+      
+      // Save to local storage as backup
+      await _persist();
+    } catch (e) {
+      debugPrint('⚠️ Failed to load from server, using local storage: $e');
+      // Fallback to local storage
+      final json = _storage.getTransactionsJson(userId);
+      _transactions = TransactionModel.decodeList(json);
+    }
+    
     debugPrint('📊 TransactionProvider initialized for user $userId with ${_transactions.length} transactions');
-    
     notifyListeners();
   }
 
@@ -47,7 +58,16 @@ class TransactionProvider with ChangeNotifier {
   }
 
   Future<void> add(TransactionModel tx) async {
-    _transactions.insert(0, tx);
+    try {
+      // Create on server
+      final created = await _apiService.createTransaction(tx);
+      _transactions.insert(0, created);
+      debugPrint('✅ Transaction created on server with ID: ${created.id}');
+    } catch (e) {
+      debugPrint('⚠️ Failed to create on server, saving locally: $e');
+      _transactions.insert(0, tx);
+    }
+    
     await _persist();
     await _syncBalanceToServer();
     notifyListeners();
@@ -56,13 +76,37 @@ class TransactionProvider with ChangeNotifier {
   Future<void> update(TransactionModel tx) async {
     final index = _transactions.indexWhere((e) => e.id == tx.id);
     if (index == -1) return;
-    _transactions[index] = tx;
+    
+    try {
+      // Update on server if it has an ID
+      if (tx.id != null) {
+        final updated = await _apiService.updateTransaction(tx.id!, tx);
+        _transactions[index] = updated;
+        debugPrint('✅ Transaction updated on server');
+      } else {
+        _transactions[index] = tx;
+      }
+    } catch (e) {
+      debugPrint('⚠️ Failed to update on server, saving locally: $e');
+      _transactions[index] = tx;
+    }
+    
     await _persist();
     await _syncBalanceToServer();
     notifyListeners();
   }
 
-  Future<void> remove(String id) async {
+  Future<void> remove(int? id) async {
+    if (id == null) return;
+    
+    try {
+      // Delete on server
+      await _apiService.deleteTransaction(id);
+      debugPrint('✅ Transaction deleted on server');
+    } catch (e) {
+      debugPrint('⚠️ Failed to delete on server: $e');
+    }
+    
     _transactions.removeWhere((e) => e.id == id);
     await _persist();
     await _syncBalanceToServer();

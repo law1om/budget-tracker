@@ -15,6 +15,7 @@
   static const _kUserEmail = 'user_email';
   static const _kCurrencyCode = 'currency_code'; // KZT/USD/EUR
   static const _kTransactionsPrefix = 'transactions_json_user_'; // Per-user transactions
+  static const _kThemePreference = 'theme_preference'; // light/dark/system
 
   Future<void> init() async {
     _prefs ??= await SharedPreferences.getInstance();
@@ -87,5 +88,12 @@
    Future<void> clearUserData(int userId) async {
      await _prefs!.remove('$_kTransactionsPrefix$userId');
    }
+   
+   // Theme preference
+   Future<void> setThemePreference(String preference) async {
+     await _prefs!.setString(_kThemePreference, preference);
+   }
+   
+   String get themePreference => _prefs!.getString(_kThemePreference) ?? 'system';
  }
 

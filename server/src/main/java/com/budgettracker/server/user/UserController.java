@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -29,15 +31,28 @@ public class UserController {
         System.out.println("  Balance: " + request.getBalance());
         System.out.println("  Currency: " + request.getCurrency());
         
-        if (request.getName() != null) user.setName(request.getName());
+        if (request.getName() != null) {
+            user.setName(request.getName());
+        }
         if (request.getBalance() != null) {
             System.out.println("💰 Setting balance: " + request.getBalance());
             user.setBalance(request.getBalance());
         }
-        if (request.getCurrency() != null) user.setCurrency(request.getCurrency());
+        if (request.getCurrency() != null) {
+            user.setCurrency(request.getCurrency());
+        }
+        if (request.getThemePreference() != null) {
+            user.setThemePreference(request.getThemePreference());
+        }
         
         User savedUser = userRepository.save(user);
+        
         System.out.println("✅ User saved. Balance in DB: " + savedUser.getBalance());
         return ResponseEntity.ok(savedUser);
+    }
+    
+    @PostMapping("/logout")
+    public ResponseEntity<Map<String, String>> logout(@AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(Map.of("message", "Logged out successfully"));
     }
 }

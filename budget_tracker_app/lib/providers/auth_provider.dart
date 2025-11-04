@@ -142,6 +142,14 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<void> logout() async {
+    // Call logout API to log activity
+    try {
+      await _apiService.logout();
+    } catch (e) {
+      // Ignore errors, continue with local logout
+      print('Logout API error (ignored): $e');
+    }
+    
     // Clear user-specific transaction data if user exists
     if (_user != null) {
       await _storage.clearUserData(_user!.id);
@@ -150,6 +158,10 @@ class AuthProvider with ChangeNotifier {
     _isLoggedIn = false;
     _user = null;
     _apiService.clearToken();
+    
+    // Reset onboarding flag so it shows again after logout
+    _onboardingSeen = false;
+    await _storage.setOnboardingSeen(false);
     
     await _storage.setLoggedIn(false);
     await _storage.clearToken();

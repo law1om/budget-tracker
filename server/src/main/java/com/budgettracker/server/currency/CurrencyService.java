@@ -40,9 +40,10 @@ public class CurrencyService {
      * @return сконвертированная сумма
      */
     public BigDecimal convert(BigDecimal amount, String from, String to) {
-        // Если валюты одинаковые, возвращаем исходную сумму
+        // Если валюты одинаковые, возвращаем исходную сумму с правильным scale
         if (from.equals(to)) {
-            return amount;
+            int scale = SCALE_BY_CURRENCY.getOrDefault(to, 2);
+            return amount.setScale(scale, RoundingMode.HALF_UP);
         }
         
         // Получаем курсы валют
@@ -54,12 +55,15 @@ public class CurrencyService {
         }
         
         // Конвертация через USD с высоким уровнем точности и финальным округлением:
-        // 1) from -> USD: amount / fromRate (без финального округления)
-        // 2) USD -> to: result * toRate (без финального округления)
+        // 1) from -> USD: amount / fromRate (с высокой точностью)
+        // 2) USD -> to: result * toRate (с высокой точностью)
         // 3) Финальное округление по правилам валюты назначения
+        // Используем более высокую точность для промежуточных вычислений
         BigDecimal inUsd = amount.divide(fromRate, MC);
         BigDecimal result = inUsd.multiply(toRate, MC);
         int scale = SCALE_BY_CURRENCY.getOrDefault(to, 2);
-        return result.setScale(scale, RoundingMode.HALF_EVEN);
+        
+        // Применяем округление HALF_UP для более предсказуемого поведения
+        return result.setScale(scale, RoundingMode.HALF_UP);
     }
 }

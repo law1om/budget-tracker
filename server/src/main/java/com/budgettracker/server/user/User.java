@@ -38,6 +38,9 @@ public class User implements UserDetails {
 
     @Builder.Default
     private String currency = "KZT";
+    
+    @Builder.Default
+    private String themePreference = "system"; // light, dark, system
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

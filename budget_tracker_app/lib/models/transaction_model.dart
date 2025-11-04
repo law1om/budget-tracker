@@ -1,10 +1,9 @@
  import 'dart:convert';
- import 'package:uuid/uuid.dart';
 
  enum TransactionType { income, expense }
 
  class TransactionModel {
-   final String id;
+   final int? id; // null для новых транзакций, заполняется сервером
    final String title;
    final double amount;
    final DateTime date;
@@ -12,26 +11,31 @@
    final TransactionType type;
 
    TransactionModel({
-     String? id,
+     this.id,
      required this.title,
      required this.amount,
      required this.date,
      required this.categoryId,
      required this.type,
-   }) : id = id ?? const Uuid().v4();
+   });
 
-   Map<String, dynamic> toJson() => {
-         'id': id,
-         'title': title,
-         'amount': amount,
-         'date': date.toIso8601String(),
-         'categoryId': categoryId,
-         'type': type.name,
-       };
+   Map<String, dynamic> toJson() {
+     final json = <String, dynamic>{
+       'title': title,
+       'amount': amount,
+       'date': date.toIso8601String(),
+       'categoryId': categoryId,
+       'type': type.name,
+     };
+     if (id != null) {
+       json['id'] = id;
+     }
+     return json;
+   }
 
    factory TransactionModel.fromJson(Map<String, dynamic> json) {
      return TransactionModel(
-       id: json['id'] as String?,
+       id: json['id'] as int?,
        title: json['title'] as String,
        amount: (json['amount'] as num).toDouble(),
        date: DateTime.parse(json['date'] as String),

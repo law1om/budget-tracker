@@ -13,4 +13,6 @@ public class UserUpdateRequest {
     private BigDecimal balance;
 
     private String currency;
+    
+    private String themePreference; // light, dark, system
 }

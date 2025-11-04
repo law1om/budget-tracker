@@ -5,6 +5,7 @@ class UserModel {
   final String email;
   final double balance;
   final String currency;
+  final String themePreference;
 
   UserModel({
     required this.id,
@@ -12,6 +13,7 @@ class UserModel {
     required this.email,
     required this.balance,
     required this.currency,
+    this.themePreference = 'system',
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -21,6 +23,7 @@ class UserModel {
       email: json['email'] ?? '',
       balance: (json['balance'] ?? 0).toDouble(),
       currency: json['currency'] ?? 'USD',
+      themePreference: json['themePreference'] ?? 'system',
     );
   }
 
@@ -31,6 +34,7 @@ class UserModel {
       'email': email,
       'balance': balance,
       'currency': currency,
+      'themePreference': themePreference,
     };
   }
 }

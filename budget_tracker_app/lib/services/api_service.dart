@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import '../config/api_config.dart';
 import '../models/auth_response.dart';
 import '../models/user_model.dart';
+import '../models/transaction_model.dart';
 
 /// Exception for API errors
 class ApiException implements Exception {
@@ -167,12 +168,14 @@ class ApiService {
     String? name,
     double? balance,
     String? currency,
+    String? themePreference,
   }) async {
     try {
       final data = <String, dynamic>{};
       if (name != null) data['name'] = name;
       if (balance != null) data['balance'] = balance;
       if (currency != null) data['currency'] = currency;
+      if (themePreference != null) data['themePreference'] = themePreference;
 
       print('📤 Sending update request to ${ApiConfig.userUpdate}');
       print('   Data: $data');
@@ -211,6 +214,81 @@ class ApiService {
       return (response.data['result'] ?? 0).toDouble();
     } on DioException catch (e) {
       throw e.error ?? ApiException('Currency conversion failed');
+    }
+  }
+  
+  /// Logout user
+  Future<void> logout() async {
+    try {
+      await _dio.post(ApiConfig.logout);
+    } on DioException catch (e) {
+      // Ignore logout errors, just clear token locally
+      print('Logout error (ignored): ${e.message}');
+    }
+  }
+  
+  // ==================== TRANSACTIONS ====================
+  
+  /// Create new transaction
+  Future<TransactionModel> createTransaction(TransactionModel transaction) async {
+    try {
+      final response = await _dio.post(
+        ApiConfig.transactions,
+        data: transaction.toJson(),
+      );
+      
+      return TransactionModel.fromJson(response.data);
+    } on DioException catch (e) {
+      throw e.error ?? ApiException('Failed to create transaction');
+    }
+  }
+  
+  /// Get all transactions
+  Future<List<TransactionModel>> getTransactions() async {
+    try {
+      final response = await _dio.get(ApiConfig.transactions);
+      
+      if (response.data is List) {
+        return (response.data as List)
+            .map((json) => TransactionModel.fromJson(json))
+            .toList();
+      }
+      return [];
+    } on DioException catch (e) {
+      throw e.error ?? ApiException('Failed to fetch transactions');
+    }
+  }
+  
+  /// Update transaction
+  Future<TransactionModel> updateTransaction(int id, TransactionModel transaction) async {
+    try {
+      final response = await _dio.put(
+        '${ApiConfig.transactions}/$id',
+        data: transaction.toJson(),
+      );
+      
+      return TransactionModel.fromJson(response.data);
+    } on DioException catch (e) {
+      throw e.error ?? ApiException('Failed to update transaction');
+    }
+  }
+  
+  /// Delete transaction
+  Future<void> deleteTransaction(int id) async {
+    try {
+      await _dio.delete('${ApiConfig.transactions}/$id');
+    } on DioException catch (e) {
+      throw e.error ?? ApiException('Failed to delete transaction');
+    }
+  }
+  
+  /// Get transaction statistics
+  Future<Map<String, dynamic>> getTransactionStats() async {
+    try {
+      final response = await _dio.get(ApiConfig.transactionsStats);
+      return response.data as Map<String, dynamic>;
+    } on DioException catch (e) {
+      throw e.error ?? ApiException('Failed to fetch transaction stats');
     }
   }
 }
