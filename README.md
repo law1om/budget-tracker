@@ -13,7 +13,7 @@
 ##Основные возможности
 
 Подробное описание пользовательских сценариев и работы с приложением доступно здесь:  
-**[How to use Budget Tracker](docs/how-to-use-budget-tracker.md)**
+**[How to use Budget Tracker](how-to-use-budget-tracker.md)**
 
 Кратко функционал включает:
 - Регистрация и авторизация пользователей
